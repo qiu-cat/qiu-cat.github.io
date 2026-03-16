@@ -1,0 +1,425 @@
+<!--双图合一制作器-->
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>双图合一制作器</title>
+<style>
+*{
+box-sizing:border-box;
+--hue:#25817c;
+--hue-hover:#25715c;
+}
+body{
+-webkit-user-select:none;
+user-select:none;
+-webkit-touch-callout:none;
+touch-callout:none;
+-webkit-tap-highlight-color:transparent;
+font-family:Verdana,sans-serif;
+max-width:800px;
+margin:0 auto;
+padding:20px;
+background-color:#daf0ef;
+min-height:100vh;
+color:#191919;
+}
+#body{
+background:#fff;
+border-radius:12px;
+padding:30px;
+box-shadow:0 8px 24px rgba(0,0,0,0.05);
+max-width:700px;
+}
+#title{
+color:var(--hue);
+text-align:center;
+margin-bottom:30px;
+font-size:28px;
+font-weight:600;
+}
+.card{
+background-color:#fafafa;
+padding:20px;
+border-radius:12px;
+margin:16px 0;
+align-items:center;
+}
+}
+
+.upload-item{
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:12px;
+}
+.file-btn{
+background-color:var(--hue);
+color:#fff;
+font-size:15px;
+padding:9px 14px;
+border-radius:8px;
+cursor:pointer;
+white-space:nowrap;
+position:relative;
+top:-17px;
+}
+.file-btn:hover{
+background:var(--hue-hover);
+}
+input[type="file"]{
+display:none;
+}
+.prev-img{
+width:60px;
+height:50px;
+object-fit:contain;
+background-color:#fafafa;
+border:1px solid #666;
+border-radius:4px;
+}
+
+.switch-group{
+margin-top:16px;
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+.switch-row{
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+.switch-label{
+font-size:14px;
+color:#444;
+}
+
+.tog{
+appearance:none;
+width:44px;
+height:24px;
+border-radius:12px;
+background-color:#e9e9ea;
+position:relative;
+cursor:pointer;
+transition:0.2s;
+}
+.tog:checked{
+background:var(--hue);
+}
+.tog::after{
+content:"";
+position:absolute;
+width:20px;
+height:20px;
+border-radius:50%;
+background-color:#fff;
+box-shadow:0 0 18px rgba(0,0,0,0.15);
+top:2px;
+left:2px;
+transition:0.2s;
+}
+.tog:checked::after{
+left:22px;
+}
+
+.bg-segment{
+display:inline-flex;
+border:1px solid #666;
+border-radius:8px;
+overflow:hidden;
+height:30px;
+}
+.seg-item{
+width:50px;
+display:grid;
+place-items:center;
+cursor:pointer;
+font-size:12px;
+transition:0.2s;
+background-color:#fcfcfc;
+color:#191919;
+}
+.seg-item.active{
+background:var(--hue);
+color:#fff;
+}
+
+.btn{
+padding:11px 18px;
+background-color:var(--hue);
+color:#fff;
+border:none;
+border-radius:8px;
+cursor:pointer;
+font-weight:bold;
+margin-right:8px;
+}
+.btn:hover{
+background-color:var(--hue-hover);
+}
+
+.result-box{
+width:100%;
+margin-top:16px;
+min-height:320px;
+background-color:#fff;
+border:2px dashed #555;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+.result-box canvas{
+max-width:100%;
+max-height:70vh;
+display:none;
+}
+
+#footer{
+text-align:center;
+margin-top:30px;
+color:var(--hue);
+font-size:14px;
+}
+</style>
+</head>
+<body>
+
+<div id="body">
+<h1 id="title">双图合一制作器</title>
+<div class="card">
+<div class="upload-item">
+<label class="file-btn" for="img1Input">白底显示（黑色）</label>
+<input type="file" id="img1Input" accept="image/*">
+<img id="img1" class="prev-img">
+</div>
+
+<div class="upload-item">
+<label class="file-btn" for="img2Input">黑底显示（白色）</label>
+<input type="file" id="img2Input" accept="image/*">
+<img id="img2" class="prev-img">
+</div>
+
+<div class="switch-group">
+<div class="switch-row">
+<span class="switch-label">锐化</span>
+<input type="checkbox" class="tog" id="sharpen" checked>
+</div>
+<div class="switch-row">
+<span class="switch-label">白底显示图反转</span>
+<input type="checkbox" class="tog" id="invertB">
+</div>
+<div class="switch-row">
+<span class="switch-label">黑底显示图反转</span>
+<input type="checkbox" class="tog" id="invertW">
+</div>
+
+<div class="switch-row">
+<span class="switch-label">显示背景</span>
+<div class="bg-segment">
+<div class="seg-item active" data-bg="white">白</div>
+<div class="seg-item" data-bg="black">黑</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<button class="btn" onclick="processAll()">转换</button>
+<button class="btn" onclick="downloadResult()">下载</button>
+<div class="result-box" id="resultBox">
+<canvas id="cvFinal"></canvas>
+</div>
+</div>
+</div>
+<p id="footer">2026.3.5 V1.1</p>
+<script>
+let imgBlackMask,imgWhiteMask;
+let finalBlob;
+const cvFinal = document.getElementById("cvFinal");
+const resultBox = document.getElementById("resultBox");
+
+//黑白开关
+const segItems = document.querySelectorAll(".seg-item");
+segItems.forEach(el =>{
+el.onclick =() =>{
+segItems.forEach(i => i.classList.remove("active"));
+el.classList.add("active");
+resultBox.style.background = el.dataset.bg === "black" ? "#000" :"#fff";
+}
+});
+
+//统一上传
+document.getElementById("img1Input").onchange = e =>{
+const f = e.target.files[0];
+if(!f) return;
+const img = new Image();
+img.onload =() =>{
+imgBlackMask = img;
+document.getElementById("img1").src = img.src;
+};
+img.src = URL.createObjectURL(f);
+};
+
+document.getElementById("img2Input").onchange = e =>{
+const f = e.target.files[0];
+if(!f) return;
+const img = new Image();
+img.onload =() =>{
+imgWhiteMask = img;
+document.getElementById("img2").src = img.src;
+};
+img.src = URL.createObjectURL(f);
+};
+
+//锐化
+function sharpen(ctx,w,h){
+if(!document.getElementById("sharpen").checked) return;
+const data = ctx.getImageData(0,0,w,h).data;
+const out = ctx.createImageData(w,h);
+const o = out.data;
+const k = [0,-1,0,-1,5,-1,0,-1,0];
+const s=3,hs=1;
+for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+let r=0,g=0,b=0;
+for(let cy=0;cy<s;cy++)for(let cx=0;cx<s;cx++){
+const sy=y+cy-hs,sx=x+cx-hs;
+if(sy>=0&&sy<h&&sx>=0&&sx<w){
+const i=(sy*w+sx)*4;
+const ww=k[cy*s+cx];
+r+=data[i]*ww; g+=data[i+1]*ww; b+=data[i+2]*ww;
+}
+}
+const i=(y*w+x)*4;
+o[i]=Math.min(255,Math.max(0,r));
+o[i+1]=Math.min(255,Math.max(0,g));
+o[i+2]=Math.min(255,Math.max(0,b));
+o[i+3]=data[i+3];
+}
+ctx.putImageData(out,0,0);
+}
+
+//居中绘制
+function drawCenter(img,cv,w,h){
+cv.width = w;
+cv.height = h;
+const ctx = cv.getContext("2d");
+ctx.clearRect(0,0,w,h);
+
+const ratio = Math.min(w / img.naturalWidth,h / img.naturalHeight);
+const nw = img.naturalWidth * ratio;
+const nh = img.naturalHeight * ratio;
+const dx =(w - nw) / 2;
+const dy =(h - nh) / 2;
+
+ctx.drawImage(img,dx,dy,nw,nh);
+sharpen(ctx,w,h);
+}
+
+//黑蒙版
+function maskBlack(ctx,w,h){
+const d=ctx.getImageData(0,0,w,h);
+const data=d.data;
+for(let i=0;i<data.length;i+=4){
+const br=(data[i]+data[i+1]+data[i+2])/3;
+data[i+3]=255-Math.round(br);
+data[i]=data[i+1]=data[i+2]=0;
+}
+ctx.putImageData(d,0,0);
+}
+
+//白蒙版
+function maskWhite(ctx,w,h){
+const d=ctx.getImageData(0,0,w,h);
+const data=d.data;
+for(let i=0;i<data.length;i+=4){
+const br=(data[i]+data[i+1]+data[i+2])/3;
+data[i+3]=Math.round(br);
+data[i]=data[i+1]=data[i+2]=255;
+}
+ctx.putImageData(d,0,0);
+}
+
+//反转图片
+function invert(ctx,w,h){
+const d=ctx.getImageData(0,0,w,h);
+const data=d.data;
+for(let i=0;i<data.length;i+=4){
+data[i]=255-data[i];
+data[i+1]=255-data[i+1];
+data[i+2]=255-data[i+2];
+}
+ctx.putImageData(d,0,0);
+}
+
+//交叉像素
+function combine(ctxDst,ctxB,ctxW,w,h){
+const b=ctxB.getImageData(0,0,w,h).data;
+const wd=ctxW.getImageData(0,0,w,h).data;
+const out=ctxDst.createImageData(w,h);
+const o=out.data;
+for(let y=0;y<h;y++){
+for(let x=0;x<w;x++){
+const i=(y*w+x)*4;
+if((x+y)%2===0){
+o[i]=b[i];o[i+1]=b[i+1];o[i+2]=b[i+2];o[i+3]=b[i+3];
+}else{
+o[i]=wd[i];o[i+1]=wd[i+1];o[i+2]=wd[i+2];o[i+3]=wd[i+3];
+}
+}
+}
+ctxDst.putImageData(out,0,0);
+}
+
+//主程序
+function processAll(){
+if(!imgBlackMask||!imgWhiteMask){
+alert("请确保图片均已上传");
+return;
+}
+const W = imgBlackMask.naturalWidth;
+const H = imgBlackMask.naturalHeight;
+
+const cvB = document.createElement("canvas");
+const cvW = document.createElement("canvas");
+
+//黑色图处理
+drawCenter(imgBlackMask,cvB,W,H);
+if(document.getElementById("invertB").checked){
+invert(cvB.getContext('2d'), W, H);
+}
+maskBlack(cvB.getContext("2d"),W,H);
+
+//白色图处理
+drawCenter(imgWhiteMask,cvW,W,H);
+if(document.getElementById("invertW").checked){
+invert(cvW.getContext('2d'), W, H);
+}
+maskWhite(cvW.getContext("2d"),W,H);
+
+cvFinal.width = W;
+cvFinal.height = H;
+combine(cvFinal.getContext("2d"),cvB.getContext("2d"),cvW.getContext("2d"),W,H);
+
+cvFinal.style.display = "block";
+cvFinal.toBlob(blob =>{ finalBlob = blob; },"image/png");
+}
+
+//下载
+function downloadResult(){
+if(!finalBlob){
+alert("请先转换");
+return;
+}
+const a = document.createElement("a");
+a.href = URL.createObjectURL(finalBlob);
+a.download = "result.png";
+a.click();
+}
+</script>
+</body>
+</html>

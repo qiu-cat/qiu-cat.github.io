@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="format-detection" content="telephone=no"/>
+<title>股票分时图</title>
+<style>
+*{
+--hue:#ac395d;
+}
+body{
+-webkit-user-select:none;
+user-select:none;
+-webkit-touch-callout:none;
+touch-callout:none;
+-webkit-tap-highlight-color:transparent;
+font-family:Verdana,sans-serif;
+max-width:800px;
+margin:0 auto;
+padding:20px;
+background-color:#ffe4e9;
+min-height:100vh;
+}
+#body{
+background:#fff;
+border-radius:12px;
+padding:30px;
+box-shadow:0 8px 24px rgba(0,0,0,0.05);
+}
+#title{
+color:var(--hue);
+text-align:center;
+margin-bottom:30px;
+font-size:28px;
+font-weight:600;
+}
+#quick-bar{
+display:flex;
+gap:8px;
+margin:12px 0;
+flex-wrap:wrap;
+}
+.btn-quick{
+width:max(30%,5em);
+height:30px;
+font-size:13px;
+border:none;
+border-radius:6px;
+background-color:var(--hue);
+color:#fff;
+cursor:pointer;
+-webkit-tap-highlight-color:rgba(255,255,255,.25);
+}
+
+#input{
+width:100%;
+height:48px;
+padding:12px 15px;
+margin:10px 0;
+border:1px solid #e2e8f0;
+border-radius:8px;
+font-size:16px;
+font-family:Verdana,sans-serif;
+caret-color:var(--hue);
+resize:vertical;
+transition:all 0.3s ease;
+box-sizing:border-box;
+outline:none;
+}
+#input:focus{
+border-color:var(--hue);
+}
+
+#input-div{
+margin-bottom:15px;
+align-items:center;
+}
+#searchBtn{
+padding:12px 25px;
+margin:10px 0;
+background-color:var(--hue);
+color:#fff;
+border:none;
+border-radius:8px;
+font-size:16px;
+font-weight:500;
+cursor:pointer;
+transition:all 0.3s ease;
+-webkit-tap-highlight-color:rgba(255,255,255,.25);
+}
+#error{
+color:#f44;
+font-size:14px;
+font-weight:bold;
+margin-bottom:10px;
+height:18px;
+}
+#chart{
+width:100%;
+height:260px;
+color:var(--hue);
+background-color:#f8f8f8;
+border-radius:8px;
+border-width:1px;
+border-style:solid;
+border-color:#e8e8e8;
+}
+#sharesTitle{
+font-size:16px;
+font-weight:bold;
+margin-bottom:10px;
+}
+#footer{
+text-align:center;
+margin-top:30px;
+color:var(--hue);
+font-size:14px;
+}
+</style>
+</head>
+<body>
+<div id="body">
+<h1 id="title">股票分时图</h1>
+
+<div id="input-div">
+<input id="input" placeholder="证券代码：">
+
+<div id="quick-bar">
+<button class="btn-quick" onclick="go('1A0001')">上证指数</button>
+<button class="btn-quick" onclick="go('399001')">深证成指</button>
+<button class="btn-quick" onclick="go('399006')">创业板指</button>
+<button class="btn-quick" onclick="go('000688')">科创50</button>
+<button class="btn-quick" onclick="go('HSI')">恒生指数</button>
+<button class="btn-quick" onclick="go('DJIA')">道琼斯</button>
+<button class="btn-quick" onclick="go('NDX')">纳斯达克</button>
+<button class="btn-quick" onclick="go('SPX')">标普500</button>
+<button class="btn-quick" onclick="go('CN0Y')">富时A50</button>
+</div>
+<button id="searchBtn" onclick="search()">查询</button>
+</div>
+
+
+<div id="error"></div>
+<div id="sharesTitle"></div>
+<svg id="chart"></svg>
+</div>
+<p id="footer">2026.2.28 V1.8</p>
+
+<script>
+const input = document.getElementById("input");
+
+//加载中SVG
+function renderLoadingSvg() {
+const svg = document.getElementById("chart");
+const w = svg.clientWidth || 760;
+const h = 260;
+svg.innerHTML = `
+<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+<g stroke="currentColor">
+<circle cx="${w/2}" cy="${h/2}" r="20" fill="none" stroke-linecap="round" stroke-width="4">
+<animate attributeName="stroke-dasharray" calcMode="spline" dur="1.5s" keySplines="0.42,0,0.58,1;0.42,0,0.58,1;0.42,0,0.58,1" keyTimes="0;0.475;0.95;1" repeatCount="indefinite" values="0 315;88 315;88 315;88 315"></animate>
+<animate attributeName="stroke-dashoffset" calcMode="spline" dur="1.5s" keySplines="0.42,0,0.58,1;0.42,0,0.58,1;0.42,0,0.58,1" keyTimes="0;0.475;0.95;1" repeatCount="indefinite" values="0;-34;-124;-124"></animate>
+</circle>
+<animateTransform attributeName="transform" dur="2s" repeatCount="indefinite" type="rotate" values="0 ${w/2} ${h/2};360 ${w/2} ${h/2}"></animateTransform>
+</g>
+<text x="${w/2}" y="${h/2 + 50}" text-anchor="middle" fill="#666" font-size="14">Loading...</text>
+</svg>
+`;
+}
+function search(){
+let code = input.value.trim().toUpperCase();
+if(!code){
+showError("请输入代码");
+input.focus();
+clearChart();
+return;
+}
+go(code);
+}
+async function go(code){
+if(!navigator.onLine){
+showError("无法连接Internet");
+clearChart(); //失败后清空加载动画
+return;
+}
+clearAll();
+renderLoadingSvg(); // 发起查询前显示加载中
+//固定
+const fixedMap ={
+"1A0001":"1.000001",
+"399001":"1.000002",
+"399006":"0.399006",
+"000688":"1.000688",
+"HSI":"100.HSI",
+"DJIA":"100.DJIA",
+"NDX":"100.NDX",
+"SPX":"100.SPX",
+"CN0Y":"104.CN00Y",
+"XAG":"122.XAG"
+};
+if(fixedMap[code]){
+loadAndShow(fixedMap[code]);
+return;
+}
+//AB股
+if(/^\d{6}$/.test(code)){
+const secid =(code.startsWith("6") || code.startsWith("5") ? "1." :"0.") + code;
+loadAndShow(secid);
+return;
+}
+//港股
+if(/^\d{4,5}$/.test(code)){
+const secid = "116." + code.padStart(5,"0");
+loadAndShow(secid);
+return;
+}
+//其他
+await tryAllMarket(code);
+}
+//试错
+async function tryAllMarket(code){
+//所有市场
+const markets = [
+100,101,102,103,104,105,106,107,109,
+110,112,113,115,122,123,125,126,131,132,133,134,
+154,167,205,233,246,
+111,114,117,118,119,120,121,124,127,128,129,130
+];
+for(const m of markets){
+//普通
+if(await tryOne(`${m}.${code}`)) return;
+//当月连续00Y
+if(await tryOne(`${m}.${code}00Y`)) return;
+}
+showError("Not Found [OTH]");
+clearChart();//失败后清空加载动画
+}
+//尝试成功就返回true
+async function tryOne(secid){
+const url = `https://push2.eastmoney.com/api/qt/stock/trends2/get?secid=${secid}&fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f53,f54,f55,f56,f57,f58`;
+try{
+const r = await fetch(url);
+const json = await r.json();
+const d = json.data;
+if(d && d.name){
+document.getElementById("sharesTitle").textContent = `${d.name}
+| 昨收 ${d.preClose || ""}`;
+if(d.trends?.length) drawSvg(d);//成功后替换加载动画
+return true;
+}
+}
+catch(e){}
+return false;
+}
+//普通加载
+function loadAndShow(secid){
+const url = `https://push2.eastmoney.com/api/qt/stock/trends2/get?secid=${secid}&fields1=f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13&fields2=f51,f53,f54,f55,f56,f57,f58`;
+fetch(url)
+.then(r => r.json())
+.then(json =>{
+const d = json.data;
+if(!d){
+showError("Not Found [CN]");
+clearChart(); //失败后清空加载动画
+return;
+}
+document.getElementById("sharesTitle").textContent = `${d.name}
+| 昨收 ${d.preClose || ""}`;
+if(d.trends?.length) drawSvg(d); //成功后替换加载动画
+})
+.catch(() => {
+clearChart(); // 异常后清空加载动画
+if(navigator.onLine){
+showError("无法连接到EASTMONEY.COM");
+}else{
+showError("无法连接Internet");
+}
+});
+}
+//工具
+function showError(msg){
+document.getElementById("error").textContent = msg;
+}
+function clearChart(){
+document.getElementById("sharesTitle").textContent = "";
+document.getElementById("chart").innerHTML = ""; //清空加载动画和分时图
+}
+function clearAll(){
+showError("");
+clearChart();
+}
+//绘制SVG
+function drawSvg(data){
+const svg = document.getElementById("chart");
+const w = svg.clientWidth || 760;
+const h = 260;
+const pad = 30;
+svg.innerHTML = ""; //清空加载动画
+svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
+const trends = data.trends.filter(t => t.split(",")[4] > 0);
+if(!trends.length) return;
+const points = trends.map(t => parseFloat(t.split(",")[1]));
+const pre = data.preClose;
+const min = Math.min(...points,pre) - 0.5;
+const max = Math.max(...points,pre) + 0.5;
+const last = points.at(-1);
+const up = last >= pre;
+const yPre = pad +(h - 2 * pad) *(1 -(pre - min) /(max - min));
+const linePre = document.createElementNS("http://www.w3.org/2000/svg","path");
+linePre.setAttribute("d",`M ${pad} ${yPre} H ${w-pad}`);
+linePre.setAttribute("stroke","#aaa");
+linePre.setAttribute("stroke-width",1);
+linePre.setAttribute("stroke-dasharray","4,4");
+svg.appendChild(linePre);
+const stepX =(w - 2 * pad) /(points.length - 1 || 1);
+let d = `M ${pad} ${pad +(h-2*pad)*(1 -(points[0]-min)/(max-min))}`;
+points.forEach((p,i) =>{
+const x = pad + i * stepX;
+const y = pad +(h-2*pad)*(1 -(p-min)/(max-min));
+d += ` L ${x} ${y}`;
+});
+const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+path.setAttribute("d",d);
+path.setAttribute("stroke",up ? "#ff3333" :"#009900");
+path.setAttribute("stroke-width",1.5);
+path.setAttribute("fill","none");
+svg.appendChild(path);
+}
+</script>
+</body>
+</html>

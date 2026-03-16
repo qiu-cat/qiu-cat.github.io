@@ -1,0 +1,216 @@
+<!--身份证校验码计算器-->
+
+<!doctype html>
+<html>
+<head>
+<title>身份证校验码计算器</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="format-detection" content="telephone=no"/>
+<style>
+:root{
+--hue:#3063ab;
+--input-color:var(--hue);
+}
+body{
+-webkit-user-select:none;
+user-select:none;
+-webkit-touch-callout:none;
+touch-callout:none;
+-webkit-tap-highlight-color:transparent;
+font-family:Verdana,sans-serif;
+max-width:800px;
+margin:0 auto;
+padding:20px;
+background-color:#dfedf9;
+min-height:100vh;
+}
+#body{
+background:#fff;
+border-radius:12px;
+padding:30px;
+box-shadow:0 8px 24px rgba(0,0,0,0.05);
+}
+#title{
+color:var(--hue);
+text-align:center;
+margin-bottom:30px;
+font-size:28px;
+font-weight:600;
+}
+#input{
+width:100%;
+height:48px;
+padding:12px 15px;
+border:1px solid #e2e8f0;
+border-radius:8px;
+font-size:16px;
+font-family:Verdana,sans-serif;
+caret-color:var(--input-color);
+resize:vertical;
+transition:all 0.3s ease;
+box-sizing:border-box;
+outline:none;
+}
+#input:focus{
+border-color:var(--input-color);
+}
+
+#btn{
+margin:20px 0;
+padding:12px 25px;
+background-color:var(--hue);
+color:#fff;
+border:none;
+border-radius:8px;
+font-size:16px;
+font-weight:500;
+cursor:pointer;
+transition:all 0.3s ease;
+-webkit-tap-highlight-color:rgba(255,255,255,.25);
+tap-highlight-color:rgba(255,255,255,.25);
+}
+
+#error{
+height:1em;
+color:#b20f03;
+margin:10px 0;
+}
+
+#result{
+background-color:#f8f8f8;
+padding:2px 20px;
+border-radius:8px;
+border-width:1px;
+border-style:solid;
+border-color:#e8e8e8;
+}
+#result-title{
+color:#2d3748;
+font-size:18px;
+font-weight:600;
+}
+#output{
+-webkit-user-select:all;
+user-select:all;
+height:1em;
+font-family:Verdana,sans-serif;
+width:100%;
+margin:20px 0 30px 0;
+}
+
+#footer{
+text-align:center;
+margin-top:30px;
+color:var(--hue);
+font-size:14px;
+}
+</style>
+</head>
+<body>
+<div id="body">
+<div id="title">身份证校验码计算器</div>
+
+<input type="tel" id="input" placeholder="输入18位身份证前17位" maxlength="17"/>
+
+<button id="btn" onclick="calculator()">计算</button>
+<div id="error"></div>
+
+<div id="result">
+<h3 id="result-title">计算结果：</h3>
+<div id="output"></div>
+</div>
+</div>
+</div>
+<div id="footer">
+2026.03.15&emsp;V1.2
+</div>
+<script>
+const input = document.getElementById("input");
+const output = document.getElementById("output");
+const errorInfo = document.getElementById("error");
+
+const hueColor = "#3063ab";
+
+function calculator(){
+const inputValue = input.value.trim();
+
+//验证输入
+if(inputValue.length !== 17 || !/^\d{17}$/.test(inputValue)){
+error("请输入前17位数字");
+return;
+}
+
+// 权重数组 Wi = 2^(i-1) mod 11，i从右到左（对应数组从左到右）
+const weights = [7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2];
+// 校验码映射表，对应余数0-10
+const checkCodes = ["1","0","X","9","8","7","6","5","4","3","2"];
+
+let sum = 0;
+for(let i = 0; i < 17; i++){
+sum += parseInt(inputValue[i]) * weights[i];
+}
+
+const checkCode = checkCodes[sum % 11];
+
+errorInfo.innerHTML = "";
+output.innerHTML = inputValue + "<b>" + checkCode + "</b>";
+output.style.display = "block";
+}
+
+function error(text){
+const error = true;
+output.innerHTML = "<div id=\"output\"></div>";
+input.placeholder = text;
+errorInfo.innerHTML = "ErrorInfo："+text;
+document.documentElement.style.setProperty("--input-color","#b20f03");
+input.focus();
+}
+
+input.addEventListener("keydown", (e)=>{
+if(e.key === "Enter" && !e.shiftKey){
+e.preventDefault();
+calculator();
+}
+
+if(error && input.value.length === 17){
+input.placeholder = "输入18位身份证前17位";
+document.documentElement.style.setProperty("--input-color",hueColor);
+errorInfo.innerHTML = "";
+const error = false;
+}
+});
+
+input.addEventListener("input", ()=>{ //过滤非数字字符
+//获取插入点位置
+const cursorStart = input.selectionStart;
+const cursorEnd = input.selectionEnd;
+
+const oldValue = input.value;
+const newValue = oldValue.replace(/[^0-9]/g, "");
+
+if (oldValue !== newValue) {
+input.value = newValue;
+//恢复插入点原位置
+input.selectionStart = cursorStart - (oldValue.length - newValue.length);
+input.selectionEnd = cursorEnd - (oldValue.length - newValue.length);
+}
+});
+
+input.addEventListener("paste", (e)=>{ //阻止默认粘贴
+e.preventDefault();
+const pasteText = (e.clipboardData || window.clipboardData).getData("text");
+
+const numText = pasteText.replace(/[^0-9]/g, "");
+
+const cursorPos = input.selectionStart;
+const oldValue = input.value;
+input.value = oldValue.slice(0, cursorPos) + numText + oldValue.slice(cursorPos);
+//恢复光标并写入数据
+input.selectionStart = input.selectionEnd = cursorPos + numText.length;
+});
+
+</script>
+</body>
+</html>
+
