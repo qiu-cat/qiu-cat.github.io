@@ -1,13 +1,14 @@
 <!doctype html>
 <html>
 <head>
-<title>EAN校验码计算器</title>
+<title>条码校验码计算器</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="format-detection" content="telephone=no"/>
 <style>
-:root{
---input-color:#289b45;
+*{
+--hue:#3063ab;
+--input-color:#3063ab;
 }
 body{
 -webkit-user-select:none;
@@ -18,28 +19,13 @@ touch-callout:none;
 font-family:Verdana,sans-serif;
 max-width:800px;
 margin:0 auto;
-padding:20px;
-background-color:#d4ebda;
+padding:50px;
+background-color:#fff;
 min-height:100vh;
-}
-#nav{
-width:100vw;
-height:calc(100vh/13);
-color:#fff;
-font-size:calc(100vh/13*0.5);
-font-weight:bold;
-display:flex;
-justify-content:center;
-align-items:center;
-}
-#body{
-background:#fff;
-border-radius:12px;
 padding:30px;
-box-shadow:0 8px 24px rgba(0,0,0,0.05);
 }
 #title{
-color:#289b45;
+color:var(--hue);
 text-align:center;
 margin-bottom:30px;
 font-size:28px;
@@ -64,7 +50,7 @@ outline:none;
 border-color:var(--input-color);
 }
 #odd:focus,#even:focus{
-border-color:#289b45;
+border-color:var(--hue);
 }
 
 #setup{
@@ -94,10 +80,10 @@ outline:none;
 
 #btn{
 padding:12px 25px;
-background-color:#289b45;
+background-color:var(--hue);
 color:#fff;
 border:none;
-border-radius:8px;
+border-radius:6px;
 font-size:16px;
 font-weight:500;
 cursor:pointer;
@@ -105,34 +91,33 @@ transition:all 0.3s ease;
 -webkit-tap-highlight-color:rgba(255,255,255,.25);
 tap-highlight-color:rgba(255,255,255,.25);
 }
+
 #result{
-background-color:#f8f8f8;
-padding:20px;
-border-radius:8px;
+background-color:#fcfcfc;
+padding:2px 20px;
 margin-top:30px;
+border-radius:8px;
 border-width:1px;
 border-style:solid;
 border-color:#e8e8e8;
 }
 #result-title{
 color:#2d3748;
-margin-bottom:15px;
 font-size:18px;
 font-weight:600;
 }
 #output{
 -webkit-user-select:all;
 user-select:all;
+height:1em;
 font-family:Verdana,sans-serif;
 width:100%;
-padding-buttom:1em;
-margin-bottom:15px;
+margin:20px 0 30px 0;
 }
-
 #footer{
 text-align:center;
-margin-top:30px;
-color:#289b45;
+margin-top:50px;
+color:#9ca3af;
 font-size:14px;
 }
 </style>
@@ -241,7 +226,7 @@ calculator();
 }
 if(error){
 input.placeholder = "输入条码(不包含校验码)";
-document.documentElement.style.setProperty("--input-color","#289b45");
+document.documentElement.style.setProperty("--input-color","#3063ab");
 const error = falst;
 }
 });
