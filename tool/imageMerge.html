@@ -1,15 +1,13 @@
-<!--双图合一制作器-->
-
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-cn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>双图合一制作器</title>
+<title>双图合一制作</title>
 <style>
 *{
 box-sizing:border-box;
---hue:#25817c;
+--hue:#3063ab;
 --hue-hover:#25715c;
 }
 body{
@@ -22,15 +20,10 @@ font-family:Verdana,sans-serif;
 max-width:800px;
 margin:0 auto;
 padding:20px;
-background-color:#daf0ef;
+background-color:#fff;
 min-height:100vh;
 color:#191919;
-}
-#body{
-background:#fff;
-border-radius:12px;
 padding:30px;
-box-shadow:0 8px 24px rgba(0,0,0,0.05);
 max-width:700px;
 }
 #title{
@@ -47,12 +40,9 @@ border-radius:12px;
 margin:16px 0;
 align-items:center;
 }
-}
 
 .upload-item{
-display:flex;
 align-items:center;
-gap:12px;
 margin-bottom:12px;
 }
 .file-btn{
@@ -181,8 +171,8 @@ display:none;
 
 #footer{
 text-align:center;
-margin-top:30px;
-color:var(--hue);
+margin-top:50px;
+color:#9ca3af;
 font-size:14px;
 }
 </style>
@@ -190,7 +180,7 @@ font-size:14px;
 <body>
 
 <div id="body">
-<h1 id="title">双图合一制作器</title>
+<h1 id="title">双图合一制作</title>
 <div class="card">
 <div class="upload-item">
 <label class="file-btn" for="img1Input">白底显示（黑色）</label>
@@ -229,7 +219,7 @@ font-size:14px;
 </div>
 
 <div class="card">
-<button class="btn" onclick="processAll()">转换</button>
+<button class="btn" onclick="processAll()">制作</button>
 <button class="btn" onclick="downloadResult()">下载</button>
 <div class="result-box" id="resultBox">
 <canvas id="cvFinal"></canvas>
