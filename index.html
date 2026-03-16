@@ -1,3 +1,104 @@
+<!doctype html>
 <html>
-cat
+<head>
+<title>广播电台</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#ffe4e9">
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<link rel="stylesheet"  href="index.css"/>
+<link rel="icon" href="../icon/favicon-180.png" type="image/png" sizes="180x180">
+<link rel="icon" href="./favicon.ico" type="image/x-icon" sizes="32x32">
+<!--<link rel="icon" href="./logo.svg" type="image/svg+xml">-->
+<link rel="shortcut icon" href="../icons/favicon.png">
+<link rel="apple-touch-icon" href="../icons/favicon.png">
+<link rel="bookmark" href="../icons/favicon.png">
+<!--<link rel="apple-touch-icon" href="./favicon-180.png"> sizes="180x180"-->
+<!--<link rel="apple-touch-icon" href="https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/cc/58/ad/cc58ad27-38e7-44a3-be6f-91e764b1c6f2/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-sRGB-85-220.png/512x512bb.png">-->
+<link rel="mask-icon" sizes="any" href="./logo.svg">
+</head>
+<body>
+<div id="top">
+<p id="title">广播电台</p>
+</div>
+<svg class="hidden">
+<defs>
+<symbol id="play" viewBox="0 0 512 512">
+<path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192s192-86 192-192Z"/><path fill="currentColor" d="m216.32 334.44l114.45-69.14a10.89 10.89 0 0 0 0-18.6l-114.45-69.14a10.78 10.78 0 0 0-16.32 9.31v138.26a10.78 10.78 0 0 0 16.32 9.31"/>
+</symbol>
+<symbol id="pause" viewBox="0 0 512 512">
+<path fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32" d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192s192-86 192-192Z">
+</path>
+<path fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M208 192v128m96-128v128">
+</path>
+</symbol>
+</defs>
+</svg>
+<div id="body">
+<video src="https://live.ximalaya.com\/radio-first-page-app/live/56/64.m3u8?transcode=ts" id="ado" class="hidden"></video>
+
+<button class="radioOption" data-src="56">
+<svg class="playIcon" viewBox="0 0 512 512">
+<use xlink:href="#play" class="icon-play"></use>
+<use xlink:href="#pause" class="icon-pause"></use>
+</svg>
+<div class="radioName">第一财经广播</div>
+</button>
+
+<button class="radioOption" data-src="69">
+<svg class="playIcon" viewBox="0 0 512 512">
+<use xlink:href="#play" class="icon-play"></use>
+<use xlink:href="#pause" class="icon-pause"></use>
+</svg>
+<div class="radioName">南京经济广播</div>
+</button>
+
+<button class="radioOption" data-src="70">
+<svg class="playIcon" viewBox="0 0 512 512">
+<use xlink:href="#play" class="icon-play"></use>
+<use xlink:href="#pause" class="icon-pause"></use>
+</svg>
+<div class="radioName">南京交通广播</div>
+</button>
+
+<button class="radioOption" data-src="71">
+<svg class="playIcon" viewBox="0 0 512 512">
+<use xlink:href="#play" class="icon-play"></use>
+<use xlink:href="#pause" class="icon-pause"></use>
+</svg>
+<div class="radioName">南京音乐广播</div>
+</button>
+
+<button class="radioOption" data-src="88">
+<svg class="playIcon" viewBox="0 0 512 512">
+<use xlink:href="#play" class="icon-play"></use>
+<use xlink:href="#pause" class="icon-pause"></use>
+</svg>
+<div class="radioName">南京体育广播</div>
+</button>
+
+<button class="radioOption" data-src="543">
+<svg class="playIcon" viewBox="0 0 512 512">
+<use xlink:href="#play" class="icon-play"></use>
+<use xlink:href="#pause" class="icon-pause"></use>
+</svg>
+<div class="radioName">南京新闻广播</div>
+</button>
+
+</div>
+<div id="bottom">
+<button id="playbtn" onclick="playRadio();">
+<svg style="width:80%;" viewBox="0 0 512 512">
+<use xlink:href="#pause" id="playsvg" class="hidden"></use>
+<use xlink:href="#play" id="pausesvg"></use>
+</svg>
+</button>
+<p id="nowRadioName">第一财经广播</p>
+<p id="error"></p>
+</div>
+
+<script src="index.js"></script>
+</body>
 </html>
+
