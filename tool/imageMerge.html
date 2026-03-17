@@ -1,17 +1,15 @@
 <!DOCTYPE html>
-<html lang="zh-cn">
+<html lang="zh-CN">
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<link rel="icon" href="/favicon.ico" size="32x32"/>
-<link rel="icon" href="/icons/favicon-180.png" size="180x180"/>
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
-<title>双图合一制作</title>
+<meta name="keywords" content="一图双显,图片转换器,预览显示不同图片,合并两张图片,预览隐藏图,同图异显,图片合成工具,图片预览和打开不一样怎么做"/>
+<meta name="description" content="创意图片处理小工具，支持将两张图片合并，实现聊天预览与打开时显示不同内容。">
+<title>双图合并小工具 - 预览与打开显示不同图片</title>
 <style>
 *{
 box-sizing:border-box;
 --hue:#3063ab;
---hue-hover:#25715c;
 }
 body{
 -webkit-user-select:none;
@@ -59,9 +57,6 @@ white-space:nowrap;
 position:relative;
 top:-17px;
 }
-.file-btn:hover{
-background:var(--hue-hover);
-}
 input[type="file"]{
 display:none;
 }
@@ -95,7 +90,7 @@ appearance:none;
 width:44px;
 height:24px;
 border-radius:12px;
-background-color:#e9e9ea;
+background-color:#e9e9e9;
 position:relative;
 cursor:pointer;
 transition:0.2s;
@@ -151,8 +146,14 @@ cursor:pointer;
 font-weight:bold;
 margin-right:8px;
 }
-.btn:hover{
-background-color:var(--hue-hover);
+
+#errorInfo{
+width:100%;
+height:1em;
+font-size:14px;
+color:#b20f03;
+margin:4px 0;
+display:block;
 }
 
 .result-box{
@@ -176,14 +177,32 @@ display:none;
 text-align:center;
 margin-top:50px;
 color:#9ca3af;
-font-size:14px;
+font-size:13px;
+}
+
+@media(prefers-color-scheme:dark){
+body{
+background-color:#000;
+}
+.card{
+background-color:#080808;
+}
+.switch-label{
+color:#d2d2d2;
+}
+.prev-img{
+background-color:#050505;
+}
+.tog{
+background-color:#232323;
+}
 }
 </style>
 </head>
 <body>
 
 <div id="body">
-<h1 id="title">双图合一制作</title>
+<h1 id="title">双图合并小工具</title>
 <div class="card">
 <div class="upload-item">
 <label class="file-btn" for="img1Input">白底显示（黑色）</label>
@@ -212,24 +231,28 @@ font-size:14px;
 </div>
 
 <div class="switch-row">
-<span class="switch-label">显示背景</span>
+<span class="switch-label">预览背景</span>
 <div class="bg-segment">
 <div class="seg-item active" data-bg="white">白</div>
 <div class="seg-item" data-bg="black">黑</div>
 </div>
 </div>
+<div id="errorInfo"></div>
 </div>
 </div>
 
 <div class="card">
 <button class="btn" onclick="processAll()">制作</button>
-<button class="btn" onclick="downloadResult()">下载</button>
+<button class="btn" onclick="downloadResult()">保存</button>
 <div class="result-box" id="resultBox">
 <canvas id="cvFinal"></canvas>
 </div>
 </div>
 </div>
-<p id="footer">2026.3.5 V1.1</p>
+<p id="footer">
+&copy; 2026 钓猫的老鼠<br/>
+<span style="font-size:10px">All Rights Reserved</span>
+</p>
 <script>
 let imgBlackMask,imgWhiteMask;
 let finalBlob;
@@ -368,12 +391,18 @@ o[i]=wd[i];o[i+1]=wd[i+1];o[i+2]=wd[i+2];o[i+3]=wd[i+3];
 ctxDst.putImageData(out,0,0);
 }
 
+function error(text){
+errorInfo.innerHTML = text;
+}
+
 //主程序
 function processAll(){
 if(!imgBlackMask||!imgWhiteMask){
-alert("请确保图片均已上传");
+error("请先将两张图片上传");
 return;
 }
+errorInfo.innerHTML = "";
+
 const W = imgBlackMask.naturalWidth;
 const H = imgBlackMask.naturalHeight;
 
@@ -405,7 +434,7 @@ cvFinal.toBlob(blob =>{ finalBlob = blob; },"image/png");
 //下载
 function downloadResult(){
 if(!finalBlob){
-alert("请先转换");
+error("先制作图片");
 return;
 }
 const a = document.createElement("a");

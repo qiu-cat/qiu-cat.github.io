@@ -1,15 +1,14 @@
 <!doctype html>
 <html lang="zh-cn">
 <head>
-<title>身份证校验码计算</title>
+<title>身份证号码校验计算</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="format-detection" content="telephone=no"/>
-<link rel="icon" href="/favicon.ico" size="32x32"/>
-<link rel="icon" href="/icons/favicon-180.png" size="180x180"/>
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+<meta name="keywords" content="身份证校验码,身份证号码校验,身份证最后一位计算,身份证号码验证,身份证号校验,身份证校验码计算,身份证最后一位怎么算,身份证号验证,身份证号码查询,身份证校验,身份证最后一位计算,身份证号码校验,身份证号验证,校验码计算,身份证在线校验"/>
+<meta name="description" content="身份证校验计算小工具，通过前17位，得出最后一位校验码，简单又实用。">
 <style>
-:root{
+*{
 --hue:#3063ab;
 --input-color:var(--hue);
 }
@@ -22,9 +21,9 @@ touch-callout:none;
 font-family:Verdana,sans-serif;
 max-width:800px;
 margin:0 auto;
+padding:30px;
 background-color:#fff;
 min-height:100vh;
-padding:30px;
 }
 #title{
 color:var(--hue);
@@ -36,6 +35,7 @@ font-weight:600;
 #input{
 width:100%;
 height:48px;
+background-color:transparent;
 padding:12px 15px;
 border:1px solid #e2e8f0;
 border-radius:8px;
@@ -49,6 +49,11 @@ outline:none;
 }
 #input:focus{
 border-color:var(--input-color);
+}
+
+#input.error:focus{
+border-color:#b20f03!important;
+caret-color:#b20f03!important;
 }
 
 #btn{
@@ -66,7 +71,7 @@ transition:all 0.3s ease;
 tap-highlight-color:rgba(255,255,255,.25);
 }
 
-#error{
+#errorInfo{
 height:1em;
 color:#b20f03;
 margin:10px 0;
@@ -96,20 +101,32 @@ margin:20px 0 30px 0;
 
 #footer{
 text-align:center;
-margin-top:30px;
-color:var(--hue);
-font-size:14px;
+margin-top:50px;
+color:#9ca3af;
+font-size:13px;
+}
+
+@media(prefers-color-scheme:dark){
+body{
+background-color:#000;
+}
+#result{
+background-color:#080808;
+}
+#result-title{
+color:#d2d2d2;
+}
 }
 </style>
 </head>
 <body>
 <div id="body">
-<div id="title">身份证校验码计算</div>
+<div id="title">身份证校验小工具</div>
 
-<input type="tel" id="input" placeholder="输入18位身份证前17位" maxlength="17"/>
+<input type="tel" id="input" placeholder="在这里输入前17位" maxlength="17"/>
 
 <button id="btn" onclick="calculator()">计算</button>
-<div id="error"></div>
+<div id="errorInfo"></div>
 
 <div id="result">
 <h3 id="result-title">计算结果：</h3>
@@ -117,15 +134,17 @@ font-size:14px;
 </div>
 </div>
 </div>
-<div id="footer">
-2026.03.15&emsp;V1.2
-</div>
+<p id="footer">
+&copy; 2026 钓猫的老鼠<br/>
+<span style="font-size:10px">All Rights Reserved</span>
+</p>
 <script>
 const input = document.getElementById("input");
 const output = document.getElementById("output");
-const errorInfo = document.getElementById("error");
+const errorInfo = document.getElementById("errorInfo");
 
 const hueColor = "#3063ab";
+const phe = input.placeholder;
 
 function calculator(){
 const inputValue = input.value.trim();
@@ -155,10 +174,10 @@ output.style.display = "block";
 
 function error(text){
 const error = true;
+input.classList.add("error");
 output.innerHTML = "<div id=\"output\"></div>";
 input.placeholder = text;
 errorInfo.innerHTML = "ErrorInfo："+text;
-document.documentElement.style.setProperty("--input-color","#b20f03");
 input.focus();
 }
 
@@ -169,8 +188,8 @@ calculator();
 }
 
 if(error && input.value.length === 17){
-input.placeholder = "输入18位身份证前17位";
-document.documentElement.style.setProperty("--input-color",hueColor);
+input.placeholder = phe;
+input.classList.remove("error");
 errorInfo.innerHTML = "";
 const error = false;
 }
@@ -208,4 +227,3 @@ input.selectionStart = input.selectionEnd = cursorPos + numText.length;
 </script>
 </body>
 </html>
-

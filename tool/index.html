@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<title>QiuCat工具箱</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="keywords" content="小众工具,实用工具,在线小工具,免费工具,个人工具,无广告工具,简洁工具,日常工具,小众在线工具,实用小工具,条码校验码,条码计算,身份证校验码,校验码计算,图片处理,图片转换,在线转换,小工具集合"/>
+<meta name="description" content="一个低调实用的个人工具站，用心做实用的小工具，提供小众在线工具，帮你轻松解决生活中的小问题～"/>
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+body{
+font-family:"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+background:#f9fafb;
+color:#1f2937;
+line-height:1.6;
+}
+.container{
+max-width:1000px;
+margin:0 auto;
+padding:0 20px;
+}
+.header{
+background:#fff;
+border-bottom:1px solid #e5e7eb;
+padding:16px 0;
+}
+.header .container{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+.logo{
+font-size:18px;
+font-weight:600;
+color:#111827;
+}
+.nav a{
+margin-left:20px;
+text-decoration:none;
+color:#4b5563;
+font-size:14px;
+}
+.nav a:hover{
+color:#2563eb;
+}
+.hero{
+text-align:center;
+padding:60px 0 40px;
+}
+.hero h1{
+font-size:28px;
+font-weight:600;
+margin-bottom:10px;
+color:#111827;
+}
+.hero p{
+font-size:16px;
+color:#6b7280;
+max-width:600px;
+margin:0 auto;
+}
+.tools{
+padding:20px 0 80px;
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+gap:20px;
+}
+.tool-card{
+background:#fff;
+border:1px solid #e5e7eb;
+border-radius:10px;
+padding:24px;
+display:flex;
+flex-direction:column;
+}
+.tool-card:hover{
+border-color:#e5e7eb;
+}
+.tool-card h3{
+font-size:16px;
+font-weight:600;
+margin-bottom:8px;
+color:#111827;
+}
+.tool-card p{
+font-size:14px;
+color:#6b7280;
+margin-bottom:16px;
+flex:1;
+}
+/* 打开＞ 样式，低调不抢戏 */
+.tool-link{
+font-size:14px;
+color:#2563eb;
+text-decoration:none;
+cursor:pointer;
+align-self:flex-start;
+}
+.tool-link:hover{
+text-decoration:underline;
+}
+.footer{
+text-align:center;
+padding:30px 0;
+font-size:13px;
+color:#9ca3af;
+border-top:1px solid #e5e7eb;
+background:#fff;
+}
+</style>
+</head>
+<body>
+
+<div class="header" hidden>
+<div class="container">
+<div class="logo">工具箱</div>
+<div class="nav">
+<a href="#about">关于</a>
+<a href="#feedback">反馈</a>
+</div>
+</div>
+</div>
+
+<div class="container">
+<div class="hero">
+<h1>QiuCat工具箱</h1>
+<p>用心做实用的小工具，提供小众在线工具<br/>帮你轻松解决生活中的小问题～</p>
+</div>
+
+<div class="tools">
+<div class="tool-card">
+<h3>双图合并 - 创意小工具</h3>
+<p>将两张图片合并，发在聊天和评论区，预览图上能看到一张图，打开时能看到另一张！</p>
+<span class="tool-link" onclick="openUrl('imageMerge.html')">打开＞</span>
+</div>
+<div class="tool-card">
+<h3>身份证校验小工具</h3>
+<p>身份证校验计算小工具，通过前17位，得出最后一位校验码，简单又实用</p>
+<span class="tool-link" onclick="openUrl('IDCheckCodeCalc.html')">打开＞</span>
+</div>
+<div class="tool-card">
+<h3>条码校验码计算</h3>
+<p>条码校验码计算小工具，帮你计算和检查条码最后一位数字</p>
+<span class="tool-link" onclick="openUrl('CheckCalc.html')">打开＞</span>
+</div>
+<div class="tool-card">
+<h3>证券分时查询（测试版）</h3>
+<p>查看指定证券今天的分时信息并绘制折线图</p>
+<span class="tool-link" onclick="openUrl('securities.html')">打开＞</span>
+</div>
+<div class="tool-card">
+<h3>努力制作中...</h3>
+<p>更多好用的小工具即将上线...</p>
+</div>
+</div>
+</div>
+
+<div class="footer">
+<div class="container">
+&copy; 2026 钓猫的老鼠<br/>
+<span style="font-size:11px;font-weight:bold;">All Rights Reserved</span>
+</p>
+<script>
+</div>
+</div>
+
+<script>
+function openUrl(url){
+window.location.href = url;
+// 新标签打开：window.open(url);
+}
+</script>
+
+</body>
+</html>

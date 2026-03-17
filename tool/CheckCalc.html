@@ -1,17 +1,15 @@
 <!doctype html>
-<html>
+<html lang="zh-cn">
 <head>
-<title>条码校验码计算器</title>
+<title>条码校验计算小工具</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
 <meta name="format-detection" content="telephone=no"/>
-<link rel="icon" href="/favicon.ico" size="32x32"/>
-<link rel="icon" href="/icons/favicon-180.png" size="180x180"/>
-<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png"/>
+<meta name="keywords" content="条码校验码,条码最后一位计算,条码校验位计算,条码验证,校验码计算,商品条码校验,条码尾号计算,条码在线计算,条码校验工具"/>
+<meta name="description" content="条码校验码计算小工具，帮你计算和检查条码最后一位数字"/>
 <style>
 *{
 --hue:#3063ab;
---input-color:#3063ab;
 }
 body{
 -webkit-user-select:none;
@@ -37,20 +35,24 @@ font-weight:600;
 #input{
 width:100%;
 height:48px;
+background-color:transparent;
 padding:12px 15px;
 border:1px solid #e2e8f0;
 border-radius:8px;
 font-size:16px;
 font-family:Verdana,sans-serif;
-caret-color:var(--input-color);
+caret-color:var(--hue);
 resize:vertical;
 transition:all 0.3s ease;
 box-sizing:border-box;
 outline:none;
 }
-
+#input.error:focus{
+border-color:#b20f03!important;
+caret-color:#b20f03!important;
+}
 #input:focus{
-border-color:var(--input-color);
+border-color:var(--hue);
 }
 #odd:focus,#even:focus{
 border-color:var(--hue);
@@ -62,7 +64,7 @@ margin-bottom:25px;
 }
 .setup-label{
 display:block;
-margin-bottom:8px;
+margin:15px 0 8px 0;
 color:#101010;
 font-weight:500;
 font-size:15px;
@@ -70,10 +72,10 @@ font-size:15px;
 #odd,#even{
 width:4em;
 padding:10px 15px;
+background-color:transparent;
 border:1px solid #e2e8f0;
 border-radius:8px;
 font-size:16px;
-background:white;
 color:#2d3748;
 margin-right:10px;
 transition:all 0.2s ease;
@@ -82,6 +84,7 @@ outline:none;
 }
 
 #btn{
+width:30%;
 padding:12px 25px;
 background-color:var(--hue);
 color:#fff;
@@ -112,22 +115,39 @@ font-weight:600;
 #output{
 -webkit-user-select:all;
 user-select:all;
-height:1em;
-font-family:Verdana,sans-serif;
+height:2em;
 width:100%;
 margin:20px 0 30px 0;
+font-family:Verdana,sans-serif;
+overflow-x:auto;
+white-space:nowrap;
 }
 #footer{
 text-align:center;
 margin-top:50px;
 color:#9ca3af;
-font-size:14px;
+font-size:13px;
+}
+
+@media(prefers-color-scheme:dark){
+body{
+background-color:#000;
+}
+#result{
+background-color:#080808;
+}
+#result-title,#odd,#even{
+color:#d4d4d4;
+}
+.setup-label{
+color:#f6f6f6;
+}
 }
 </style>
 </head>
 <body>
 <div id="body">
-<div id="title">校验码计算器</div>
+<div id="title">条码校验码计算</div>
 
 <input type="tel" id="input" placeholder="输入条码(不包含校验码)"/>
 
@@ -167,14 +187,19 @@ font-size:14px;
 </div>
 </div>
 </div>
-<div id="footer">
-2026.01.22&emsp;V2.0
-</div>
+<p id="footer">
+&copy; 2026 钓猫的老鼠<br/>
+<span style="font-size:10px">All Rights Reserved</span>
+</p>
 <script>
 const input = document.getElementById('input');
 const odd_select = document.getElementById('odd');
 const even_select = document.getElementById('even');
 const output = document.getElementById("output");
+
+const hueColor = getComputedStyle(document.documentElement).getPropertyValue('--hue');
+const phe = input.placeholder;
+var error;
 
 function calculator(){
 const code = input.value;
@@ -211,14 +236,14 @@ const checkDigit = nextMultipleOf10 - sum;
 
 const outputcontent = digits.split("").join("<wbr/>");
 
-output.innerHTML = "<div id=\"output\">" + outputcontent + "<wbr/>" + checkDigit +"</div>";
+output.innerHTML = outputcontent + "<wbr/>" + checkDigit;
 }
 
 function error(text){
-const error = true;
-output.innerHTML = "<div id=\"output\"></div>";
+error = true;
+output.innerHTML = "";
 input.placeholder = text;
-document.documentElement.style.setProperty("--input-color","#e5284c");
+input.classList.add("error");
 input.focus();
 }
 
@@ -228,9 +253,9 @@ e.preventDefault();
 calculator();
 }
 if(error){
-input.placeholder = "输入条码(不包含校验码)";
-document.documentElement.style.setProperty("--input-color","#3063ab");
-const error = falst;
+input.placeholder = phe;
+input.classList.remove("error");
+error = false;
 }
 });
 
