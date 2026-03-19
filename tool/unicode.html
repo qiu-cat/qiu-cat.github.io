@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+<title>Unicode获取工具 - QiuCat工具箱</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="keywords" content="获取unicode,unicode获取,在线获取unicode,获取字符unicode,获取文字unicode,获取特殊符号unicode,获取unicode编码,获取unicode码点,unicode编码获取,unicode码点获取,字符串获取unicode,汉字获取unicode,字母获取unicode,数字获取unicode,符号获取unicode,批量获取unicode,快速获取unicode,一键获取unicode,免费获取unicode"/>
+<meta name="description" content="一个字符转Unicode小工具，帮助你快速获取文字、符号、特殊字符的Unicode编码值。"/>
+<style>
+*{
+--hue:#3063ab;
+--input-color:var(--hue);
+}
+body{
+-webkit-user-select:none;
+user-select:none;
+-webkit-touch-callout:none;
+touch-callout:none;
+-webkit-tap-highlight-color:transparent;
+font-family:Verdana,sans-serif;
+max-width:800px;
+margin:0 auto;
+padding:30px;
+background-color:#fff;
+min-height:100vh;
+}
+#title{
+color:var(--hue);
+text-align:center;
+margin-bottom:30px;
+font-size:28px;
+font-weight:600;
+}
+#input{
+width:100%;
+height:8em;
+background-color:transparent;
+padding:12px 15px;
+border:1px solid #e2e8f0;
+border-radius:8px;
+font-size:16px;
+font-family:Verdana,sans-serif;
+caret-color:var(--input-color);
+resize:vertical;
+transition:all 0.3s ease;
+box-sizing:border-box;
+outline:none;
+}
+#input:focus{
+border-color:var(--input-color);
+}
+
+#input.error:focus{
+border-color:#b20f03!important;
+caret-color:#b20f03!important;
+}
+
+.btn{
+margin:20px 0;
+padding:12px 25px;
+background-color:var(--hue);
+color:#fff;
+border:none;
+border-radius:8px;
+font-size:16px;
+font-weight:500;
+cursor:pointer;
+transition:all 0.3s ease;
+-webkit-tap-highlight-color:rgba(255,255,255,.25);
+tap-highlight-color:rgba(255,255,255,.25);
+}
+
+#result{
+background-color:#f8f8f8;
+padding:2px 20px;
+border-radius:8px;
+border-width:1px;
+border-style:solid;
+border-color:#e8e8e8;
+}
+#result-title{
+color:#2d3748;
+font-size:18px;
+font-weight:600;
+}
+#output{
+font-family:Verdana,sans-serif;
+width:100%;
+height:9em;
+margin:20px 0 30px 0;
+overflow-y:auto;
+}
+.result-item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:8px 0;
+border-bottom:1px solid #eee;
+}
+.result-item:last-child{
+border-bottom:none;
+}
+.char{
+min-width:30px;
+-webkit-user-select:all;
+user-select:all;
+}
+.unicode{
+flex:1;
+padding:0 10px;
+}
+.copy{
+padding:4px 8px;
+background:var(--hue);
+color:#fff;
+border:none;
+border-radius:4px;
+cursor:pointer;
+}
+#footer{
+text-align:center;
+margin-top:50px;
+color:#9ca3af;
+font-size:13px;
+}
+
+@media(prefers-color-scheme:dark){
+body{
+background-color:#111;
+color:#eee;
+}
+#input{
+background-color:#222;
+border-color:#444;
+color:#eee;
+}
+#result{
+background-color:#222;
+border-color:#444;
+}
+#result-title{
+color:#eee;
+}
+.result-item{
+border-color:#444;
+}
+}
+</style>
+</head>
+<body>
+<div id="body">
+<div id="title">Unicode获取工具</div>
+<textarea id="input" placeholder="在这里输入一些..."></textarea>
+<button class="btn" id="convert">获取</button>
+<button class="btn" id="clear">清空</button>
+<div id="result">
+<h3 id="result-title">转换的结果：</h3>
+<div id="output"></div>
+</div>
+
+<p id="footer">
+&copy; 2026 钓猫的老鼠<br/>
+<span style="font-size:10px">All Rights Reserved</span>
+</p>
+
+<script>
+const input = document.getElementById('input');
+const convertBtn = document.getElementById('convert');
+const clearBtn = document.getElementById('clear');
+const output = document.getElementById('output');
+
+const phe = input.placeholder;
+var isErr = false;
+
+function getUnicode(char){
+const codePoint = char.codePointAt(0);
+let hex = codePoint.toString(16).toUpperCase();
+return `U+${hex}`;
+}
+
+function handleConvert(){
+const inputValue = input.value;
+output.innerHTML = '';
+
+if(!inputValue){
+error("请输入内容");
+return;
+}
+
+for(let i=0; i<inputValue.length; i++){
+if(
+inputValue.charCodeAt(i) >= 0xD800 &&
+inputValue.charCodeAt(i) <= 0xDBFF &&
+i+1 < inputValue.length
+){
+const char = inputValue.substring(i,i+2);
+const unicode = getUnicode(char);
+addResultItem(char,unicode);
+i++;
+}else{
+const char = inputValue[i];
+const unicode = getUnicode(char);
+addResultItem(char,unicode);
+}
+}
+}
+
+function addResultItem(char,unicode){
+const item = document.createElement('div');
+item.className = 'result-item';
+item.innerHTML = `
+<div class="char">${char}</div>
+<div class="unicode">${unicode}</div>
+<button class="copy" data-unicode="${unicode}">点击复制</button>
+`;
+output.appendChild(item);
+
+item.querySelector('.copy').addEventListener('click',function(){
+const unicode = this.getAttribute('data-unicode');
+navigator.clipboard.writeText(unicode).then(()=>{
+this.textContent = '复制成功';
+setTimeout(() =>{
+this.textContent = '点击复制';
+},1000);
+});
+});
+}
+
+function handleClear(){
+input.value = '';
+reErr();
+input.focus();
+}
+
+convertBtn.addEventListener('click',handleConvert);
+clearBtn.addEventListener('click',handleClear);
+
+function error(text){
+isErr = true;
+output.innerHTML = "";
+input.placeholder = text;
+input.classList.add("error");
+input.focus();
+}
+function reErr(){
+if(error){
+input.placeholder = phe;
+input.classList.remove("error");
+isErr = false;
+}
+}
+input.addEventListener('keydown',(e)=>{
+reErr();
+});
+</script>
+</body>
+</html>

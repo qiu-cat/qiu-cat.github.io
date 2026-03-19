@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="zh-cn">
+<head>
+<title>进制转换工具 - QiuCat工具箱</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="format-detection" content="telephone=no"/>
+<meta name="keywords" content="进制转换,二进制转换,十进制转换,十六进制转换,进制转换器,在线进制转换,编程工具,十进制转二进制,十进制转十六进制,十进制转八进制,二进制转十进制，十六进制转十进制,八进制转十进制"/>
+<meta name="description" content="一个在线进制转换器，支持十进制、二进制、十六进制互转，适合编程与开发使用。"/>
+<style>
+*{
+--hue:#3063ab;
+}
+body{
+-webkit-user-select:none;
+user-select:none;
+-webkit-touch-callout:none;
+touch-callout:none;
+-webkit-tap-highlight-color:transparent;
+font-family:Verdana,sans-serif;
+max-width:800px;
+margin:0 auto;
+padding:50px;
+background-color:#fff;
+min-height:100vh;
+padding:30px;
+}
+#title{
+color:var(--hue);
+text-align:center;
+margin-bottom:30px;
+font-size:28px;
+font-weight:600;
+}
+#input{
+width:100%;
+height:48px;
+background-color:transparent;
+padding:12px 15px;
+border:1px solid #e2e8f0;
+border-radius:8px;
+font-size:16px;
+font-family:Verdana,sans-serif;
+caret-color:var(--hue);
+resize:vertical;
+transition:all 0.3s ease;
+box-sizing:border-box;
+outline:none;
+}
+#input.error:focus{
+border-color:#b20f03!important;
+caret-color:#b20f03!important;
+}
+#input:focus{
+border-color:var(--hue);
+}
+#in:focus,#out:focus{
+border-color:var(--hue);
+}
+
+#setup{
+margin-top:20px;
+margin-bottom:25px;
+}
+.setup-label{
+display:block;
+margin:15px 0 8px 0;
+color:#101010;
+font-weight:500;
+font-size:15px;
+}
+#in,#out{
+padding:10px 15px;
+background-color:transparent;
+border:1px solid #e2e8f0;
+border-radius:8px;
+font-size:16px;
+color:#2d3748;
+margin-right:10px;
+transition:all 0.2s ease;
+cursor:pointer;
+outline:none;
+}
+
+#btn{
+margin:20px 0;
+padding:12px 25px;
+background-color:var(--hue);
+color:#fff;
+border:none;
+border-radius:6px;
+font-size:16px;
+font-weight:500;
+cursor:pointer;
+transition:all 0.3s ease;
+-webkit-tap-highlight-color:rgba(255,255,255,.25);
+tap-highlight-color:rgba(255,255,255,.25);
+}
+#errorInfo{
+height:1em;
+color:#b20f03;
+margin:10px 0;
+}
+
+#result{
+background-color:#fcfcfc;
+padding:2px 20px;
+margin-top:30px;
+border-radius:8px;
+border-width:1px;
+border-style:solid;
+border-color:#e8e8e8;
+}
+#result-title{
+color:#2d3748;
+font-size:18px;
+font-weight:600;
+}
+#output{
+-webkit-user-select:all;
+user-select:all;
+height:2em;
+width:100%;
+margin:20px 0 30px 0;
+font-family:Verdana,sans-serif;
+overflow-x:auto;
+white-space:nowrap;
+}
+#footer{
+text-align:center;
+margin-top:50px;
+color:#9ca3af;
+font-size:13px;
+}
+
+@media(prefers-color-scheme:dark){
+body{
+background-color:#000;
+}
+#result{
+background-color:#080808;
+}
+#result-title,#in,#out{
+color:#d4d4d4;
+}
+.setup-label{
+color:#f6f6f6;
+}
+}
+</style>
+</head>
+<body>
+<div id="body">
+<div id="title">进制转换工具</div>
+
+<input type="text" id="input" placeholder="在这里输入..."/>
+
+<div id="setup">
+<label class="setup-label">输入进制:</label>
+<select id="in">
+<option value="2">二进制</option>
+<option value="8">八进制</option>
+<option value="10" selected>十进制</option>
+<option value="16">十六进制</option>
+</select>
+
+<label class="setup-label">目标进制:</label>
+<select id="out">
+<option value="2">二进制</option>
+<option value="8">八进制</option>
+<option value="10">十进制</option>
+<option value="16" selected>十六进制</option>
+</select>
+</div>
+
+<button id="btn" onclick="convert()">转换</button>
+<div id="errorInfo"></div>
+
+<div id="result">
+<h3 id="result-title">转换结果：</h3>
+<div id="output"></div>
+</div>
+</div>
+
+<p id="footer">
+&copy; 2026 钓猫的老鼠<br/>
+<span style="font-size:10px">All Rights Reserved</span>
+</p>
+
+<script>
+const input = document.getElementById('input');
+const in_select = document.getElementById('in');
+const out_select = document.getElementById('out');
+const output = document.getElementById("output");
+const errorInfo = document.getElementById("errorInfo");
+
+var isErr = false;
+
+function convert(){
+const str = input.value.trim();
+const from = parseInt(in_select.value);
+const to = parseInt(out_select.value);
+
+if(str == ""){
+error("在上面输入一个数字...");
+output.innerHTML = "";
+return;
+}
+
+try{
+let num = parseInt(str,from);
+if(isNaN(num)) throw new Error();
+
+let res = num.toString(to).toUpperCase();
+output.textContent = res;
+clearError();
+} catch(e){
+error("这个输入无效");
+output.innerHTML = "";
+}
+}
+
+function error(text){
+isErr = true;
+errorInfo.innerHTML = text;
+input.classList.add("error");
+input.focus();
+}
+
+function clearError(){
+if(isErr){
+errorInfo.innerHTML = "";
+input.classList.remove("error");
+isErr = false;
+}
+}
+
+input.addEventListener('keydown',(e)=>{
+if(e.key === 'Enter' && !e.shiftKey){
+e.preventDefault();
+convert();
+}
+clearError();
+});
+
+input.addEventListener('input',()=>{
+clearError();
+});
+
+input.addEventListener("input", ()=>{ //过滤非数字字符
+//获取插入点位置
+const cursorStart = input.selectionStart;
+const cursorEnd = input.selectionEnd;
+
+const oldValue = input.value;
+const newValue = oldValue.replace(/[^0-9a-fA-F]/g, "");
+
+if (oldValue !== newValue) {
+input.value = newValue;
+//恢复插入点原位置
+input.selectionStart = cursorStart - (oldValue.length - newValue.length);
+input.selectionEnd = cursorEnd - (oldValue.length - newValue.length);
+}
+});
+
+input.addEventListener("paste", (e)=>{ //阻止默认粘贴
+e.preventDefault();
+const pasteText = (e.clipboardData || window.clipboardData).getData("text");
+
+const numText = pasteText.replace(/[^0-9a-fA-F]/g,"");
+
+const cursorPos = input.selectionStart;
+const oldValue = input.value;
+input.value = oldValue.slice(0, cursorPos) + numText + oldValue.slice(cursorPos);
+//恢复光标并写入数据
+input.selectionStart = input.selectionEnd = cursorPos + numText.length;
+});
+</script>
+</body>
+</html>
